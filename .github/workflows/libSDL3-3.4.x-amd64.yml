@@ -1,7 +1,7 @@
 # 在 GitHub Actions 上编译 SDL3_image（兼容 glibc >= 2.35 的系统，如 deepin 2.38）
 # 源码取自 Debian 官方源码包（deb.debian.org），避免依赖 GitHub releases 的直连可用性
 # 产物：libSDL3.so.0 + libSDL3_image.so.0，与本地 lib/sdl3/lib/ 用法一致
-name: Build SDL3 + SDL3_image
+name: libSDL3_image-3.4.x-glibc235-x64
 
 on:
   workflow_dispatch:
@@ -87,5 +87,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: sdl3-${{ inputs.sdl3_version }}-image-${{ inputs.sdl3_image_version }}-glibc2.35
+          name: libSDL3_image-3.4.x-glibc235-x64
           path: dist/*
