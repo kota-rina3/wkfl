@@ -22,6 +22,7 @@ jobs:
   build:
     # 关键：用 22.04（glibc 2.35），产物才能在 deepin glibc 2.38 上运行
     runs-on: ubuntu-22.04
+    container: linuxdeepin/deepin:crimson-amd64-v1.6.0
 
     steps:
       - name: Install build dependencies
