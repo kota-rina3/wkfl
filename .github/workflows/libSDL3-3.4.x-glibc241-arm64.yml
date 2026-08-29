@@ -30,7 +30,7 @@ jobs:
           apt update
           apt install -y \
             build-essential cmake ninja-build pkg-config \
-            libpng-dev libjpeg-turbo8-dev libtiff-dev libwebp-dev libavif-dev \
+            libpng-dev libtiff-dev libwebp-dev libavif-dev \
             libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev \
             libxi-dev libxss-dev libxtst-dev \
             libwayland-dev libxkbcommon-dev libegl-dev libgl-dev \
