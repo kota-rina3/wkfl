@@ -1,0 +1,92 @@
+# 在 GitHub Actions 上编译 SDL3_image（兼容 glibc >= 2.35 的系统，如 deepin 2.38）
+# 源码取自 Debian 官方源码包（deb.debian.org），避免依赖 GitHub releases 的直连可用性
+# 产物：libSDL3.so.0 + libSDL3_image.so.0，与本地 lib/sdl3/lib/ 用法一致
+name: libSDL3_image-3.4.x-glibc241-x64
+
+on:
+  workflow_dispatch:
+    inputs:
+      sdl3_version:
+        description: "SDL3 Debian 上游版本（不含 -修订号）"
+        required: true
+        default: "3.4.14+ds"
+      sdl3_image_version:
+        description: "SDL3_image Debian 上游版本（不含 -修订号）"
+        required: true
+        default: "3.4.4+ds"
+
+env:
+  DEBIAN_POOL: http://deb.debian.org/debian/pool/main/libs
+
+jobs:
+  build:
+    # 关键：用 22.04（glibc 2.35），产物才能在 deepin glibc 2.38 上运行
+    runs-on: ubuntu-24.04
+    container: debian:13
+
+    steps:
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake ninja-build pkg-config \
+            libpng-dev libjpeg-turbo8-dev libtiff-dev libwebp-dev libavif-dev \
+            libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev \
+            libxi-dev libxss-dev libxtst-dev \
+            libwayland-dev libxkbcommon-dev libegl-dev libgl-dev \
+            libasound2-dev libpulse-dev libpipewire-0.3-dev libdbus-1-dev libudev-dev \
+            libdecor-0-dev
+
+      - name: Download Debian source packages
+        run: |
+          curl -fsSL -o SDL3.orig.tar.xz \
+            "$DEBIAN_POOL/libsdl3/libsdl3_${{ inputs.sdl3_version }}.orig.tar.xz"
+          curl -fsSL -o SDL3_image.orig.tar.xz \
+            "$DEBIAN_POOL/libsdl3-image/libsdl3-image_${{ inputs.sdl3_image_version }}.orig.tar.xz"
+          tar xf SDL3.orig.tar.xz
+          tar xf SDL3_image.orig.tar.xz
+          # 自动探测顶层目录名（Debian 版本号带 +ds 后缀，目录名不带）
+          echo "SDL3_DIR=$(tar tf SDL3.orig.tar.xz | head -1 | cut -d/ -f1)" >> "$GITHUB_ENV"
+          echo "SDL3_IMAGE_DIR=$(tar tf SDL3_image.orig.tar.xz | head -1 | cut -d/ -f1)" >> "$GITHUB_ENV"
+
+      - name: Build SDL3
+        run: |
+          cmake -S "$SDL3_DIR" -B sdl3-build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$PWD/SDL3_INSTALL" \
+            -DCMAKE_INSTALL_LIBDIR=lib \
+            -DSDL_TESTS=OFF -DSDL_EXAMPLES=OFF
+          cmake --build sdl3-build
+          cmake --install sdl3-build
+
+      - name: Build SDL3_image
+        run: |
+          cmake -S "$SDL3_IMAGE_DIR" -B image-build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$PWD/SDL3_INSTALL" \
+            -DCMAKE_INSTALL_PREFIX="$PWD/IMAGE_INSTALL" \
+            -DCMAKE_INSTALL_LIBDIR=lib \
+            -DSDL3IMAGE_TESTS=OFF \
+            -DSDL3IMAGE_BACKEND_STB=OFF \
+            -DSDL3IMAGE_BACKEND_WIC=OFF
+          cmake --build image-build
+          cmake --install image-build
+
+      - name: Verify artifacts
+        run: |
+          mkdir -p dist
+          cp SDL3_INSTALL/lib/libSDL3.* dist/
+          cp IMAGE_INSTALL/lib/libSDL3_image.so.0* dist/
+          # 检查 glibc 版本需求，必须 <= 2.38
+          for f in dist/*.so.0*; do
+            maxver=$(objdump -T "$f" | grep -oE 'GLIBC_2\.[0-9]+' | sort -uV | tail -1)
+            echo "$f -> 需要 $maxver"
+          done
+          # 确认关键符号存在
+          nm -D dist/libSDL3_image.so.0 | grep -E "IMG_SaveBMP_IO|IMG_Load_IO"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libSDL3_image-3.4.x-glibc241-x64
+          path: dist/*
