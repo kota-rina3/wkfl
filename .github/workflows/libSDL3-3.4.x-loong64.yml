@@ -74,4 +74,4 @@ jobs:
       if: always()
       with:
         name: libSDL3_image-3.4.x-glibc238-loong64
-        path: dist/*
+        path: ./
