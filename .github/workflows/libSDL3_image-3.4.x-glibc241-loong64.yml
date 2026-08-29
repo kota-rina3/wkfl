@@ -1,0 +1,77 @@
+name: libSDL3_image-3.4.x-glibc241-loong64
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 编译构建 (loong64)
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 设置 QEMU（loong64 模拟）
+      uses: docker/setup-qemu-action@v3
+
+    - name: 在 deepin-loong64 容器中编译
+      continue-on-error: true
+      run: |
+        docker run --platform linux/loong64 \
+          -v "${{ github.workspace }}:/workspace" \
+          -w /workspace \
+          ghcr.io/loong64/debian:trixie \
+          bash -c '
+            set -e
+
+            apt update
+            apt install -y \
+              build-essential cmake ninja-build pkg-config \
+              libpng-dev libtiff-dev libwebp-dev libavif-dev \
+              libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev \
+              libxi-dev libxss-dev libxtst-dev \
+              libwayland-dev libxkbcommon-dev libegl-dev libgl-dev \
+              libasound2-dev libpulse-dev libpipewire-0.3-dev libdbus-1-dev libudev-dev \
+              libdecor-0-dev
+
+            curl -fsSL -o SDL3.orig.tar.xz \
+              "http://deb.debian.org/debian/pool/main/libs/libsdl3/libsdl3_3.4.14+ds.orig.tar.xz"
+            curl -fsSL -o SDL3_image.orig.tar.xz \
+              "http://deb.debian.org/debian/pool/main/libs/libsdl3-image/libsdl3-image_3.4.4+ds.orig.tar.xz"
+            tar xf SDL3.orig.tar.xz
+            tar xf SDL3_image.orig.tar.xz
+            # 自动探测顶层目录名（Debian 版本号带 +ds 后缀，目录名不带）
+            SDL3_DIR=$(tar tf SDL3.orig.tar.xz | head -1 | cut -d/ -f1)
+            SDL3_IMAGE_DIR=$(tar tf SDL3_image.orig.tar.xz | head -1 | cut -d/ -f1)
+
+            cmake -S "$SDL3_DIR" -B sdl3-build -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_INSTALL_PREFIX="$PWD/SDL3_INSTALL" \
+              -DCMAKE_INSTALL_LIBDIR=lib \
+              -DSDL_TESTS=OFF -DSDL_EXAMPLES=OFF
+            cmake --build sdl3-build
+            cmake --install sdl3-build
+
+            cmake -S "$SDL3_IMAGE_DIR" -B image-build -G Ninja \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_PREFIX_PATH="$PWD/SDL3_INSTALL" \
+              -DCMAKE_INSTALL_PREFIX="$PWD/IMAGE_INSTALL" \
+              -DCMAKE_INSTALL_LIBDIR=lib \
+              -DSDL3IMAGE_TESTS=OFF \
+              -DSDL3IMAGE_BACKEND_STB=OFF \
+              -DSDL3IMAGE_BACKEND_WIC=OFF
+            cmake --build image-build
+            cmake --install image-build
+
+            mkdir -p dist
+            cp SDL3_INSTALL/lib/libSDL3.* dist/
+            cp IMAGE_INSTALL/lib/libSDL3_image.so.0* dist/
+          '
+
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: libSDL3_image-3.4.x-glibc241-loong64
+        path: ./
