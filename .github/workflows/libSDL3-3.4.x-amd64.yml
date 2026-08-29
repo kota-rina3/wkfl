@@ -74,7 +74,7 @@ jobs:
       - name: Verify artifacts
         run: |
           mkdir -p dist
-          cp SDL3_INSTALL/lib/libSDL3.so.0* dist/
+          cp SDL3_INSTALL/lib/libSDL3.* dist/
           cp IMAGE_INSTALL/lib/libSDL3_image.so.0* dist/
           # 检查 glibc 版本需求，必须 <= 2.38
           for f in dist/*.so.0*; do
