@@ -27,8 +27,8 @@ jobs:
     steps:
       - name: Install build dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
+          apt update
+          apt install -y \
             build-essential cmake ninja-build pkg-config \
             libpng-dev libjpeg-turbo8-dev libtiff-dev libwebp-dev libavif-dev \
             libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev \
