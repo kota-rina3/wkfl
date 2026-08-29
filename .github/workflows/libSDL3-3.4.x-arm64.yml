@@ -22,6 +22,7 @@ jobs:
   build:
     # 关键：用 22.04（glibc 2.35），产物才能在 deepin glibc 2.38 上运行
     runs-on: ubuntu-24.04-arm
+    container: linuxdeepin/deepin:crimson-arm64-v1.6.0
 
     steps:
       - name: Install build dependencies
@@ -29,7 +30,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             build-essential cmake ninja-build pkg-config \
-            libpng-dev libjpeg-turbo8-dev libtiff-dev libwebp-dev libavif-dev \
+            libpng-dev libtiff-dev libwebp-dev libavif-dev \
             libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev \
             libxi-dev libxss-dev libxtst-dev \
             libwayland-dev libxkbcommon-dev libegl-dev libgl-dev \
