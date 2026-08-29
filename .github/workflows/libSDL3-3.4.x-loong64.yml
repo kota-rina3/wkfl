@@ -42,8 +42,8 @@ jobs:
             tar xf SDL3.orig.tar.xz
             tar xf SDL3_image.orig.tar.xz
             # 自动探测顶层目录名（Debian 版本号带 +ds 后缀，目录名不带）
-            echo "SDL3_DIR=$(tar tf SDL3.orig.tar.xz | head -1 | cut -d/ -f1)" >> "$GITHUB_ENV"
-            echo "SDL3_IMAGE_DIR=$(tar tf SDL3_image.orig.tar.xz | head -1 | cut -d/ -f1)" >> "$GITHUB_ENV"
+            SDL3_DIR=$(tar tf SDL3.orig.tar.xz | head -1 | cut -d/ -f1)
+            SDL3_IMAGE_DIR=$(tar tf SDL3_image.orig.tar.xz | head -1 | cut -d/ -f1
 
             cmake -S "$SDL3_DIR" -B sdl3-build -G Ninja \
               -DCMAKE_BUILD_TYPE=Release \
