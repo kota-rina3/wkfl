@@ -17,7 +17,8 @@ jobs:
     - name: 安装所需依赖
       run: |
         apt update && apt upgrade -y
-        apt install -y build-essential python3 python3-setuptools ca-certificates curl xz-utils cmake libx11-dev
+        apt install -y build-essential python3 python3-setuptools ca-certificates curl xz-utils cmake \
+          libx11-dev libxtst-dev libxinerama-dev libxrandr-dev libpng-dev
         curl -fsSL "https://nodejs.org/dist/v22.23.2/node-v22.23.2-linux-x64.tar.xz" -o /tmp/node.tar.xz
         tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1
         node -v
