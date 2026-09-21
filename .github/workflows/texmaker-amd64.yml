@@ -11,8 +11,7 @@ jobs:
     container: linuxdeepin/deepin:crimson-amd64-v1.6.0
 
     steps:
-    - name: 检查代码
-      uses: actions/checkout@v4
+    
 
     - name: 解压
       run: |
@@ -27,15 +26,20 @@ jobs:
         cd texmaker-6.0.2
         ls
 
+    - name: 检查代码
+      uses: actions/checkout@v4
+        
     - name: 构建
       continue-on-error: false
+      uses: actions/checkout@v4
       run: |
-        cmake -S . -B build -DCMAKE_INSTALL_PREFIX=./build/usr -DCMAKE_BUILD_TYPE=Release
+
+        mkdir build && cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
         cmake --build build -j 8
-        cmake --install .
 
     - name: 上传构建产物
       uses: actions/upload-artifact@v4
       with:
         name: texmaker-amd64
-        path: ./texmaker-6.0.2
+        path: ./build
