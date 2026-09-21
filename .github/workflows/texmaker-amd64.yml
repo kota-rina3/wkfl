@@ -1,0 +1,38 @@
+name: texmaker-amd64
+
+on:
+  workflow_dispatch:
+    branch: master
+
+jobs:
+  build:
+    name: 编译构建
+    runs-on: ubuntu-latest
+    container: linuxdeepin/deepin:crimson-amd64-v1.6.0
+
+    steps:
+    - name: 检查代码
+      uses: actions/checkout@v4
+
+    - name: 解压
+      run: |
+        apt update && apt upgrade -y
+        apt install -y bzip2
+        tar -xjvf texmaker-6.0.2.tar.bz2
+
+    - name: 安装所需依赖
+      run: |
+        apt build-dep . -y
+
+    - name: 构建deb包
+      continue-on-error: false
+      run: |
+        dpkg-buildpackage -uc -us -nc -b
+        mkdir ./texmaker-amd64
+        cp ./*.deb ./texmaker-amd64
+
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: texmaker-amd64
+        path: ./texmaker-amd64
