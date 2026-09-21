@@ -11,7 +11,8 @@ jobs:
     container: linuxdeepin/deepin:crimson-amd64-v1.6.0
 
     steps:
-    
+    - name: 检查代码
+      uses: actions/checkout@v4
 
     - name: 解压
       run: |
@@ -24,9 +25,6 @@ jobs:
         apt install -y build-essential cmake make git python3-pip qt6-base-dev qt6-5compat-dev \
           qt6-declarative-dev qt6-tools-dev qt6-tools-dev-tools qt6-webengine-dev libxcb-cursor0
         
-
-    - name: 检查代码
-      uses: actions/checkout@v4
         
     - name: 构建
       continue-on-error: false
