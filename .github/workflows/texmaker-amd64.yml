@@ -23,7 +23,8 @@ jobs:
     - name: 安装所需依赖
       run: |
         apt install -y build-essential cmake make git python3-pip qt6-base-dev qt6-5compat-dev \
-          qt6-declarative-dev qt6-tools-dev qt6-tools-dev-tools qt6-webengine-dev libxcb-cursor0
+          qt6-declarative-dev qt6-tools-dev qt6-tools-dev-tools qt6-webengine-dev libxcb-cursor0 \
+          libxkbcommon-dev libxkbcommon-x11-dev
         
         
     - name: 构建
@@ -32,8 +33,9 @@ jobs:
         cd texmaker-6.0.2
         ls
         mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release
-        cmake --build -j 8
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./usr
+        cmake --build . -j 8
+        cmake --install .
 
     - name: 上传构建产物
       uses: actions/upload-artifact@v4
