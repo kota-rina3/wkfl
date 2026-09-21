@@ -35,9 +35,6 @@ jobs:
         cmake .. -DCMAKE_BUILD_TYPE=Release
         cmake --build build -j 8
 
-    - name: 清理构建产物
-
-
     - name: 上传构建产物
       uses: actions/upload-artifact@v4
       with:
