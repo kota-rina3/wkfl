@@ -23,6 +23,7 @@ jobs:
     - name: 安装所需依赖
       run: |
         apt build-dep . -y
+        cd texmaker-6.0.2
 
     - name: 构建deb包
       continue-on-error: false
