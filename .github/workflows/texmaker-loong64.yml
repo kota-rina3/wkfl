@@ -1,0 +1,47 @@
+name: texmaker-loong64
+
+on:
+  workflow_dispatch:
+    branch: master
+
+jobs:
+  build:
+    name: 编译构建 (loong64)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 检查代码
+      uses: actions/checkout@v4
+
+    - name: 设置 QEMU（loong64 模拟）
+      uses: docker/setup-qemu-action@v4
+
+    - name: 在 deepin-loong64 容器中编译
+      run: |
+        docker run --platform linux/loong64 \
+          -v "${{ github.workspace }}:/workspace" \
+          -w /workspace \
+          linuxdeepin/deepin:crimson-loong64-v1.6.0 \
+          bash -c '
+            set -e
+            apt update && apt upgrade -y
+            apt install -y bzip2
+            tar -xjvf texmaker-6.0.2.tar.bz2
+
+            apt install -y build-essential cmake make git python3-pip qt6-base-dev qt6-5compat-dev \
+              qt6-declarative-dev qt6-tools-dev qt6-tools-dev-tools qt6-webengine-dev libxcb-cursor0 \
+              libxkbcommon-dev libxkbcommon-x11-dev
+
+            cd texmaker-6.0.2
+            ls
+            mkdir build && cd build
+            cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=./usr
+            cmake --build . -j 8
+            cmake --install .
+          '
+
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: texmaker-loong64
+        path: ./texmaker-6.0.2/build
