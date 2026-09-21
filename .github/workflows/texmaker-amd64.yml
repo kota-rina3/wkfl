@@ -33,7 +33,9 @@ jobs:
         ls
         mkdir build && cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release
-        cmake --build build -j 8 -DCMAKE_INSTALL_PREFIX=./build/usr
+        cmake --build build -j 8
+
+    - name: 清理构建产物
 
 
     - name: 上传构建产物
