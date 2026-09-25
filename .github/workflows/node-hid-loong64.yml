@@ -25,8 +25,7 @@ jobs:
           bash -c '
             set -e
             apt update && apt upgrade -y
-            apt install -y build-essential python3 python3-setuptools ca-certificates curl xz-utils cmake \
-              libx11-dev libxtst-dev libxinerama-dev libxrandr-dev libpng-dev libudev-dev libusb-1.0-0 libusb-1.0-0-dev
+            apt install -y build-essential python3 python3-setuptools ca-certificates curl xz-utils cmake libx11-dev libxtst-dev libxinerama-dev libxrandr-dev libpng-dev libudev-dev libusb-1.0-0 libusb-1.0-0-dev pkg-config
             curl -fsSL "https://unofficial-builds.nodejs.org/download/release/v22.21.1/node-v22.21.1-linux-loong64.tar.xz" -o /tmp/node.tar.xz
             tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1
             node -v
