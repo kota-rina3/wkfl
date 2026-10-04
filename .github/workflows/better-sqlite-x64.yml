@@ -28,8 +28,8 @@ jobs:
     - name: 安装并编译模块
       continue-on-error: false
       run: |
-        npm install -g better-sqlite3@12.8.0 --build-from-source --runtime=electron --target=42.3.0 --arch=x64 --dist-url=https://electronjs.org/headers --foreground-scripts
-        npm install node-pty@1.1.0 --build-from-source --runtime=electron --target=42.3.0 --arch=x64 --dist-url=https://electronjs.org/headers --foreground-scripts 
+        npm install -g better-sqlite3@12.8.0 --build-from-source --runtime=electron --target=39.2.7 --arch=x64 --dist-url=https://electronjs.org/headers --foreground-scripts
+        npm install node-pty@1.1.0 --build-from-source
 
     - name: 上传构建产物
       uses: actions/upload-artifact@v4
