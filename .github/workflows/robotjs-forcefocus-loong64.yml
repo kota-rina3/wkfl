@@ -33,7 +33,7 @@ jobs:
             npm -v
             npm install -g node-gyp@12.2.0
 
-            npm install robotjs@0.6.0 --build-from-source
+            npm install robotjs@0.6.13 --build-from-source
             npm install forcefocus@1.1.0 --build-from-source
             
           '
